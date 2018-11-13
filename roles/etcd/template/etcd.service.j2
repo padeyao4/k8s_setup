@@ -1,0 +1,32 @@
+{% set list=[] %}
+{% for host in groups['etcd'] %}
+{% set str = hostvars[host]['ansible_hostname'] + "=" + "http://"+ hostvars[host]['ansible_default_ipv4']['address'] +":2380" %}
+{{ list.append(str) }}
+{% endfor %}
+
+Description=Etcd Server
+After=network.target
+After=network-online.target
+Wants=network-online.target
+Documentation=http://github.com/coreos
+
+[Service]
+Type=notify
+WorkingDirectory=/ilabservice/etcd/
+EnvironmentFile=-/etc/etcd/etcd.conf
+ExecStart=/ilabservice/etcd/etcd \
+  --name {{ansible_hostname}} \
+  --listen-peer-urls http://{{ansible_default_ipv4.address}}:2380 \
+  --listen-client-urls http://{{ansible_default_ipv4.address}}:2379,http://127.0.0.1:2379 \
+  --advertise-client-urls http://{{ansible_default_ipv4.address}}:2379 \
+  --initial-advertise-peer-urls http://{{ansible_default_ipv4.address}}:2380 \
+  --initial-cluster-token $token \
+  --initial-cluster '{{list|join(",")}}' \
+  --initial-cluster-state=new \
+  --data-dir /ilabservice/etcd
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

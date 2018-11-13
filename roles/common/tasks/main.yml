@@ -1,0 +1,162 @@
+
+- name: 安装基本包
+  yum: 
+    name:
+    - sysstat
+    - wget
+    - nc
+    - rsync
+    - man
+    - bzip2
+    - openssh-clients
+    - strace
+    - zip
+    - unzip 
+    - lrzsz
+    - epel-release
+    state: latest
+
+- name: 升级系统
+  yum: name="*" state=latest
+
+- name: 停用firewalld
+  service: name=firewalld state=stopped enabled=no
+
+- name: 禁用selinux
+  lineinfile:
+    dest: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: 'SELINUX=disabled'
+
+- name: /etc/hosts disable ipv6
+  lineinfile:
+      dest: /etc/hosts
+      regexp: '^::1'
+      state: absent
+
+- name: 调整history显示记录数为5000
+  lineinfile:
+      dest: /etc/profile
+      regexp: '^HISTSIZE'
+      line: 'HISTSIZE=5000'
+
+- name: 调整history文件记录数为20000
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^HISTFILESIZE'
+    line: 'HISTFILESIZE=20000'
+    insertafter: '^HISTSIZE'
+
+- name: history添加时间戳
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^export HISTTIMEFORMAT'
+    line: 'export HISTTIMEFORMAT="%F %T "'
+    insertafter: '^HISTFILESIZE'
+
+- name: 添加超时时间
+  lineinfile:
+    dest: /etc/profile
+    regexp: '^TMOUT'
+    line: 'TMOUT=1200'
+
+- name: 删除不需要的用户组
+  group: name={{ item }} state=absent
+  with_items:
+    - games
+
+- name: 删除不需要的用户
+  user: name={{ item }} state=absent
+  with_items:
+    - lp
+    - games
+
+- name: 保留内核数目
+  lineinfile:
+    dest: /etc/yum.conf
+    regexp: '^installonly_limit'
+    line: 'installonly_limit=3'
+
+- name: 内核优化
+  copy: src=../files/sysctl.conf dest=/etc/sysctl.conf
+
+- name: 生效内核变更
+  command: sysctl -p 
+
+- name: create group  
+  with_items:
+  - { name: 'ilabservice',gid: 1888 }
+  - { name: 'viewer',gid: 1999 }
+  - { name: 'oper',gid: 2111 }
+  - { name: 'archer',gid: 2222 }
+  group: name={{ item.name }} gid={{ item.gid }} state=present
+
+
+- name: create user
+  user: name={{ item.name }} uid={{ item.uid }} group={{ item.group }} state=present
+  with_items:
+  - { name: 'ilabservice',uid: 1888,group : 'ilabservice' }
+  - { name: 'viewer',uid: 1999,group : 'viewer' }
+  - { name: 'oper',uid: 2111,group : 'oper' }
+  - { name: 'archer',uid: 2222,group : 'archer' }
+
+- name: 创建日常目录
+  file: path={{ item }} state=directory owner=ilabservice group=ilabservice
+  with_items:
+    - /ilabservice/src
+    - /ilabservice/data
+    - /ilabservice/logs
+    - /ilabservice/scripts
+    - /ilabservice/backup
+
+- name: install the latest openssh-server
+  yum: name=openssh-server disablerepo=epel state=latest
+
+- name: create group  
+  group: name={{ item.name }} gid={{ item.gid }} state=present
+  with_items:
+    - { name: 'ilabservice',gid: 1888 }
+    - { name: 'viewer',gid: 1999 }
+    - { name: 'oper',gid: 2111 }
+    - { name: 'archer',gid: 2222 }
+
+- name: create user
+  user: name={{ item.name }} uid={{ item.uid }} group={{ item.group }} state=present
+  with_items:
+    - { name: 'ilabservice',uid: 1888,group : 'ilabservice' }
+    - { name: 'viewer',uid: 1999,group : 'viewer' }
+    - { name: 'oper',uid: 2111,group : 'oper' }
+    - { name: 'archer',uid: 2222,group : 'archer' }
+
+- name: Set up authorized_keys for ilabservice
+  authorized_key: user=ilabservice key="{{ item }}"
+  with_file:
+    - ../files/id_rsa.pub  
+
+- name: Set up authorized_keys for oper
+  authorized_key: user=oper key="{{ item }}"
+  with_file:
+    - ../files/id_rsa.pub
+
+- name: Set up authorized_keys for viewer
+  authorized_key: user=viewer key="{{ item }}"
+  with_file:
+    - ../files/id_rsa.pub
+
+- name: Set up authorized_keys for archer
+  authorized_key: user=archer key="{{ item }}"
+  with_file:
+    - ../files/id_rsa.pub
+
+- name: copy ssh_config file
+  copy: src=./files/ssh_config dest=/etc/ssh/ssh_config owner=root group=root mode=0644 backup=yes
+
+- name: copy sshd_config file
+  copy: src=./files/sshd_config dest=/etc/ssh/sshd_config owner=root group=root mode=0600 backup=yes
+
+- name: copy history.sh file
+  copy: src=./files/history.sh dest=/etc/profile.d/history.sh owner=root group=root mode=0644 backup=yes
+
+- name: copy sudoers file
+  copy: src=./files/sudoers dest=/etc/sudoers owner=root group=root mode=0400 backup=yes
+

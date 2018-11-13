@@ -1,0 +1,21 @@
+Port 22
+Protocol 2
+LogLevel DEBUG
+SyslogFacility AUTHPRIV
+LoginGraceTime 2m
+PermitRootLogin no
+StrictModes yes
+MaxAuthTries 6
+PubkeyAuthentication yes
+AuthorizedKeysFile .ssh/authorized_keys
+PasswordAuthentication no
+PermitEmptyPasswords no
+PermitUserEnvironment yes
+PrintMotd no
+ChallengeResponseAuthentication no
+UseDNS no
+PrintLastLog yes
+UsePAM yes
+TCPKeepAlive yes
+MaxStartups 10
+Subsystem   sftp    /usr/libexec/openssh/sftp-server

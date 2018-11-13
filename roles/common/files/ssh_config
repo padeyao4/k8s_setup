@@ -1,0 +1,7 @@
+host *
+   ForwardAgent yes
+   ForwardX11 yes
+   Port 18822
+   SendEnv LANG LC_*
+   HashKnownHosts yes 
+   StrictHostKeyChecking no

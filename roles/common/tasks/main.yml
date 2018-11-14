@@ -1,0 +1,37 @@
+- yum: 
+    name:
+    - epel-release
+    - conntrack 
+    - ipvsadm 
+    - ipset 
+    - jq
+    - sysstat 
+    - curl
+    - iptables
+    - libseccomp
+    state: latest
+
+- service: name=firewalld state=stopped enabled=no
+
+- lineinfile:
+    dest: /etc/selinux/config
+    regexp: '^SELINUX='
+    line: 'SELINUX=disabled'
+
+- command: swapoff -a
+- command: sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+- command: modprobe br_netfilter
+- command: modprobe ip_vs
+
+
+- copy: src=../files/kubernetes.conf dest=/etc/sysctl.d/
+- command: sysctl -p /etc/sysctl.d/kubernetes.conf
+
+- command: timedatectl set-timezone Asia/Shanghai
+- command: timedatectl set-local-rtc 0
+- systemd: name=rsyslog state=restarted
+- systemd: name=crond state=restarted
+- command: ntpdate cn.pool.ntp.org
+
+- file: path=/etc/kubernetes/ssl state=directory

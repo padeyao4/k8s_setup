@@ -11,6 +11,7 @@
 - hosts: node
   gather_facts: true
   roles:
+  - common    
   - flanneld
   - docker
 

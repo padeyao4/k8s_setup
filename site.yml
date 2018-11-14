@@ -5,10 +5,10 @@
 #   roles:
 #   - common
 
-- hosts: etcd
-  gather_facts: true
-  roles:
-  - etcd
+# - hosts: etcd
+#   gather_facts: true
+#   roles:
+#   - etcd
 
 # - hosts: etcd[0]
 #   tasks:
@@ -17,7 +17,8 @@
 - hosts: node
   gather_facts: true
   roles:
-  - flanneld
+  # - flanneld
+  - docker
 
 
 

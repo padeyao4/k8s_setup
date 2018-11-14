@@ -1,0 +1,15 @@
+- unarchive: src=../files/docker.tar.gz dest=/ilabservice/ mode=500
+
+- copy: src=../files/docker.service dest=/etc/systemd/system/
+
+- file: path=/etc/docker state=directory 
+
+- copy: src=../files/daemon.json dest=/etc/docker/
+
+- command: ln -s /ilabservice/docker/docker /usr/bin/docker
+
+- name: reload systemd
+  command: systemctl daemon-reload
+
+- name: start docker
+  systemd: name=docker state=started enabled=yes

@@ -1,23 +1,18 @@
 
 ---
-# - hosts: all
-#   gather_facts: false
-#   roles:
-#   - common
+- hosts: etcd
+  gather_facts: true
+  roles:
+  - etcd
 
-# - hosts: etcd
-#   gather_facts: true
-#   roles:
-#   - etcd
-
-# - hosts: etcd[0]
-#   tasks:
-#   - command: /ilabservice/etcd/etcdctl set '/kubernetes/network/config' '{"Network":"172.17.0.0/16"}'
+- hosts: etcd[0]
+  tasks:
+  - command: /opt/etcd/etcdctl set '/kubernetes/network/config' '{"Network":"172.17.0.0/16"}'
 
 - hosts: node
   gather_facts: true
   roles:
-  # - flanneld
+  - flanneld
   - docker
 
 

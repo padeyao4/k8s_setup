@@ -1,4 +1,4 @@
-- unarchive: src=../files/docker.tar.gz dest=/ilabservice/ mode=500
+- unarchive: src=../files/docker.tar.gz dest=/opt/ mode=500
 
 - copy: src=../files/docker.service dest=/etc/systemd/system/
 
@@ -6,7 +6,7 @@
 
 - copy: src=../files/daemon.json dest=/etc/docker/
 
-- command: ln -s /ilabservice/docker/docker /usr/bin/docker
+- command: ln -s /opt/docker/docker /usr/bin/docker
 
 - name: reload systemd
   command: systemctl daemon-reload

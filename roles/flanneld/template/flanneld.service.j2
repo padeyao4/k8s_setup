@@ -14,11 +14,11 @@ Before=docker.service
 
 [Service]
 Type=notify
-ExecStart=/ilabservice/flanneld/flanneld \
+ExecStart=/opt/flanneld/flanneld \
   -etcd-endpoints "{{list|join(",")}}" \
   -etcd-prefix /kubernetes/network \
   -iface "{{ansible_default_ipv4.interface}}"
-ExecStartPost=/ilabservice/flanneld/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
+ExecStartPost=/opt/flanneld/mk-docker-opts.sh -k DOCKER_NETWORK_OPTIONS -d /run/flannel/docker
 Restart=on-failure
 
 [Install]

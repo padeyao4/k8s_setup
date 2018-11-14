@@ -12,9 +12,9 @@ Documentation=http://github.com/coreos
 
 [Service]
 Type=notify
-WorkingDirectory=/ilabservice/etcd/
+WorkingDirectory=/opt/etcd/
 EnvironmentFile=-/etc/etcd/etcd.conf
-ExecStart=/ilabservice/etcd/etcd \
+ExecStart=/opt/etcd/etcd \
   --name {{ansible_hostname}} \
   --listen-peer-urls http://{{ansible_default_ipv4.address}}:2380 \
   --listen-client-urls http://{{ansible_default_ipv4.address}}:2379,http://127.0.0.1:2379 \
@@ -23,7 +23,7 @@ ExecStart=/ilabservice/etcd/etcd \
   --initial-cluster-token $token \
   --initial-cluster '{{list|join(",")}}' \
   --initial-cluster-state=new \
-  --data-dir /ilabservice/etcd
+  --data-dir /opt/etcd
 Restart=on-failure
 RestartSec=5
 LimitNOFILE=65536

@@ -1,0 +1,34 @@
+[Unit]
+Description=Kubernetes Controller Manager
+Documentation=https://github.com/GoogleCloudPlatform/kubernetes
+
+[Service]
+ExecStart=/ilab/kubernetes/server/bin/kube-controller-manager \
+  --port=10252 \
+  --kubeconfig=/ilab/ssl/kube-controller-manager.kubeconfig \
+  --service-cluster-ip-range=10.254.0.0/16 \
+  --cluster-name=kubernetes \
+  --cluster-signing-cert-file=/ilab/ssl/ca.pem \
+  --cluster-signing-key-file=/ilab/ssl/ca-key.pem \
+  --experimental-cluster-signing-duration=87600h \
+  --root-ca-file=/ilab/ssl/ca.pem \
+  --service-account-private-key-file=/ilab/ssl/ca-key.pem \
+  --leader-elect=true \
+  --feature-gates=RotateKubeletServerCertificate=true \
+  --controllers=*,bootstrapsigner,tokencleaner \
+  --horizontal-pod-autoscaler-use-rest-clients=true \
+  --horizontal-pod-autoscaler-sync-period=10s \
+  --tls-cert-file=/ilab/ssl/kube-controller-manager.pem \
+  --tls-private-key-file=/ilab/ssl/kube-controller-manager-key.pem \
+  --use-service-account-credentials=true \
+  --alsologtostderr=true \
+  --logtostderr=false \
+  --log-dir=/var/log/kubernetes \
+  --v=2
+Restart=on
+Restart=on-failure
+RestartSec=5
+User=root
+
+[Install]
+WantedBy=multi-user.target

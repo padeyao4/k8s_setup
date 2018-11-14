@@ -1,11 +1,10 @@
-- unarchive: src=../cfssl.tar.gz dest=/opt/
-- unarchive: src=../kubernetes.tar.gz dest=/opt/
+- unarchive: src=../files/cfssl.tar.gz dest=/opt/
+- unarchive: src=../files/kubernetes.tar.gz dest=/opt/
 
 - copy: 
     src: ../files/{{item}}
     dest: /etc/kubernetes/ssl/
   with_items:
-    - create_crt.sh
     - encryption-config.yml
     - token.csv
 
@@ -31,6 +30,7 @@
     - kube-scheduler-csr.json.j2
     - csr-crb.yaml.j2
     - kube-proxy-csr.json.j2
+    - create_crt.sh.j2
 
 - file: path=/etc/kubernetes/ssl state=directory
 - command: cd /etc/kubernetes/ssl/ && sh create_crt.sh

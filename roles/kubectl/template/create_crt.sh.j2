@@ -72,7 +72,7 @@ cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
 
 # 生成 kube-scheduler kubeconfig 配置文件
 kubectl config set-cluster kubernetes \
-  --certificate-authority=/etc/kubernetes/cert/ca.pem \
+  --certificate-authority=/etc/kubernetes/ssl/ca.pem \
   --embed-certs=true \
   --server https://{{ansible_default_ipv4.address}}:6443 \
   --kubeconfig=kube-scheduler.kubeconfig
@@ -93,13 +93,13 @@ kubectl config use-context system:kube-scheduler --kubeconfig=kube-scheduler.kub
 
 # 生成 kubelet kubeconfig 配置文件
 kubectl config set-cluster kubernetes \
-    --certificate-authority=/etc/kubernetes/cert/ca.pem \
+    --certificate-authority=/etc/kubernetes/ssl/ca.pem \
     --embed-certs=true \
     --server https://{{ansible_default_ipv4.address}}:6443 \
     --kubeconfig=kubelet-bootstrap.kubeconfig
 
 kubectl config set-credentials kubelet-bootstrap \
-    --token=${BOOTSTRAP_TOKEN} \
+    --token=3e6916ba861192f279c67d827952ea30 \
     --kubeconfig=kubelet-bootstrap.kubeconfig
 
 kubectl config set-context default \
@@ -121,7 +121,7 @@ cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
 
 # kube-proxy kubeconfig 配置文件
 kubectl config set-cluster kubernetes \
-  --certificate-authority=/etc/kubernetes/cert/ca.pem \
+  --certificate-authority=/etc/kubernetes/ssl/ca.pem \
   --embed-certs=true \
   --server https://{{ansible_default_ipv4.address}}:6443 \
   --kubeconfig=kube-proxy.kubeconfig

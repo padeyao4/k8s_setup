@@ -20,7 +20,7 @@ ExecStart=/opt/kubernetes/server/bin/kube-apiserver \
   --authorization-mode Node,RBAC \
   --runtime-config api/all \
   --enable-bootstrap-token-auth \
-  --token-auth-file /etcd/kubernetes/ssl/token.csv \
+  --token-auth-file /etc/kubernetes/ssl/token.csv \
   --service-cluster-ip-range 10.254.0.0/16 \
   --service-node-port-range 8000-10000 \
   --tls-cert-file /etc/kubernetes/ssl/kubernetes.pem \

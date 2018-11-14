@@ -1,4 +1,8 @@
 ---
+- hosts: all
+  roles:
+  - common
+
 - hosts: etcd
   gather_facts: true
   roles:
@@ -11,9 +15,16 @@
 - hosts: node
   gather_facts: true
   roles:
-  - common    
   - flanneld
   - docker
+
+- hosts: master
+  gather_facts: true
+  roles:
+  - kubectl
+  # - kube-apiserver
+  # - kube-controller-manager
+  # - kube-scheduler
 
 
 

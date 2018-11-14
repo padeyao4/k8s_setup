@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+
+# 生成 ca
+cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+
+# 创建 admin 证书
+cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
+  -ca-key=/etc/kubernetes/ssl/ca-key.pem \
+  -config=/etc/kubernetes/ssl/ca-config.json \
+  -profile=kubernetes admin-csr.json | cfssljson -bare admin
+
+# kubectl 配置 
+kubectl config set-cluster kubernetes \
+  --certificate-authority=/etc/kubernetes/ssl/ca.pem \
+  --embed-certs=true \
+  --server https://{{ansible_default_ipv4.address}}:6443 \
+  --kubeconfig=kubectl.kubeconfig
+
+kubectl config set-credentials admin \
+  --client-certificate=admin.pem \
+  --client-key=admin-key.pem \
+  --embed-certs=true \
+  --kubeconfig=kubectl.kubeconfig
+
+kubectl config set-context kubernetes \
+  --cluster=kubernetes \
+  --user=admin \
+  --kubeconfig=kubectl.kubeconfig
+
+kubectl config use-context kubernetes --kubeconfig=kubectl.kubeconfig
+
+mkdir ~/.kube -p && cp kubectl.kubeconfig ~/.kube/config
+
+# kube-apiserver 证书
+cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
+  -ca-key=/etc/kubernetes/ssl/ca-key.pem \
+  -config=/etc/kubernetes/ssl/ca-config.json \
+  -profile=kubernetes kubernetes-csr.json | cfssljson -bare kubernetes
+
+
+cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
+  -ca-key=/etc/kubernetes/ssl/ca-key.pem \
+  -config=/etc/kubernetes/ssl/ca-config.json \
+  -profile=kubernetes kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+
+# 生成 kube-controller-manager kubeconfig 配置文件
+kubectl config set-cluster kubernetes \
+  --certificate-authority=/etc/kubernetes/ssl/ca.pem \
+  --embed-certs=true \
+  --server http://{{ansible_default_ipv4.address}}:6443 \
+  --kubeconfig=kube-controller-manager.kubeconfig
+
+kubectl config set-credentials system:kube-controller-manager \
+  --client-certificate=kube-controller-manager.pem \
+  --client-key=kube-controller-manager-key.pem \
+  --embed-certs=true \
+  --kubeconfig=kube-controller-manager.kubeconfig
+
+kubectl config set-context system:kube-controller-manager \
+  --cluster=kubernetes \
+  --user=system:kube-controller-manager \
+  --kubeconfig=kube-controller-manager.kubeconfig
+
+kubectl config use-context system:kube-controller-manager --kubeconfig=kube-controller-manager.kubeconfig
+
+# kube-scheduler证书
+
+cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
+  -ca-key=/etc/kubernetes/ssl/ca-key.pem \
+  -config=/etc/kubernetes/ssl/ca-config.json \
+  -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+
+# 生成 kube-scheduler kubeconfig 配置文件
+kubectl config set-cluster kubernetes \
+  --certificate-authority=/etc/kubernetes/cert/ca.pem \
+  --embed-certs=true \
+  --server https://{{ansible_default_ipv4.address}}:6443 \
+  --kubeconfig=kube-scheduler.kubeconfig
+
+kubectl config set-credentials system:kube-scheduler \
+  --client-certificate=kube-scheduler.pem \
+  --client-key=kube-scheduler-key.pem \
+  --embed-certs=true \
+  --kubeconfig=kube-scheduler.kubeconfig
+
+kubectl config set-context system:kube-scheduler \
+  --cluster=kubernetes \
+  --user=system:kube-scheduler \
+  --kubeconfig=kube-scheduler.kubeconfig
+
+kubectl config use-context system:kube-scheduler --kubeconfig=kube-scheduler.kubeconfig
+
+
+# 生成 kubelet kubeconfig 配置文件
+kubectl config set-cluster kubernetes \
+    --certificate-authority=/etc/kubernetes/cert/ca.pem \
+    --embed-certs=true \
+    --server https://{{ansible_default_ipv4.address}}:6443 \
+    --kubeconfig=kubelet-bootstrap.kubeconfig
+
+kubectl config set-credentials kubelet-bootstrap \
+    --token=${BOOTSTRAP_TOKEN} \
+    --kubeconfig=kubelet-bootstrap.kubeconfig
+
+kubectl config set-context default \
+    --cluster=kubernetes \
+    --user=kubelet-bootstrap \
+    --kubeconfig=kubelet-bootstrap.kubeconfig
+
+kubectl config use-context default --kubeconfig=kubelet-bootstrap.kubeconfig
+
+
+# 自动授权node的认证请求
+kubectl apply -f csr-crb.yaml
+
+# kube-proxy 证书
+cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
+  -ca-key=/etc/kubernetes/ssl/ca-key.pem \
+  -config=/etc/kubernetes/ssl/ca-config.json \
+  -profile=kubernetes  kube-proxy-csr.json | cfssljson -bare kube-proxy
+
+# kube-proxy kubeconfig 配置文件
+kubectl config set-cluster kubernetes \
+  --certificate-authority=/etc/kubernetes/cert/ca.pem \
+  --embed-certs=true \
+  --server https://{{ansible_default_ipv4.address}}:6443 \
+  --kubeconfig=kube-proxy.kubeconfig
+
+kubectl config set-credentials kube-proxy \
+  --client-certificate=kube-proxy.pem \
+  --client-key=kube-proxy-key.pem \
+  --embed-certs=true \
+  --kubeconfig=kube-proxy.kubeconfig
+
+kubectl config set-context default \
+  --cluster=kubernetes \
+  --user=kube-proxy \
+  --kubeconfig=kube-proxy.kubeconfig
+
+kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig

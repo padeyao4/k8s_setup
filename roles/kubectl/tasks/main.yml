@@ -1,0 +1,36 @@
+- unarchive: src=../cfssl.tar.gz dest=/opt/
+- unarchive: src=../kubernetes.tar.gz dest=/opt/
+
+- copy: 
+    src: ../files/{{item}}
+    dest: /etc/kubernetes/ssl/
+  with_items:
+    - create_crt.sh
+    - encryption-config.yml
+    - token.csv
+
+- file: 
+    src: /opt/cfssl/{{item}} 
+    dest: /usr/bin/{{item}}
+    state: link
+  with_items:
+    - cfssl
+    - cfssl-certinfo
+    - cfssljson
+- file: src=/opt/kubernetes/server/bin/kubectl dest=/usr/bin/kubectl state=link
+
+- template: 
+    src: ../template/{{item}}
+    dest: /etc/kubernetes/ssl/{{item|replace('.j2','')}}
+  with_items:
+    - ca-config.json.j2
+    - ca-csr.json.j2
+    - admin-csr.json.j2
+    - kubernetes-csr.json.j2
+    - kube-controller-manager-csr.json.j2
+    - kube-scheduler-csr.json.j2
+    - csr-crb.yaml.j2
+    - kube-proxy-csr.json.j2
+
+- file: path=/etc/kubernetes/ssl state=directory
+- command: cd /etc/kubernetes/ssl/ && sh create_crt.sh

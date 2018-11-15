@@ -12,6 +12,9 @@
 * etcd 版本为 3.3.10 
 * etcd 集群没有tls加密
 
+## 验证过的环境
+* 阿里云centos7.4
+
 ## 如何运行
 
 1. 按照```example_hosts```添加服务器ip,并命名为```hosts```

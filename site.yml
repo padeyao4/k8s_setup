@@ -12,19 +12,29 @@
   tasks:
   - command: /opt/etcd/etcdctl set '/kubernetes/network/config' '{"Network":"172.17.0.0/16"}'
 
+- hosts: master
+  gather_facts: true
+  roles:
+  - kubectl
+  - kube-apiserver
+  # - kube-controller-manager
+  # - kube-scheduler
+  tasks:
+    - name: 将master的证书和配置文件分发到node上
+      synchronize:
+        src: /etc/kubernetes/ssl/{item}
+        dest: /etc/kubernetes/ssl/{item}
+        mode: pull
+      delegate_to: node
+      with_items:
+        - ca.pem
+        - kubelet-bootstrap.kubeconfig
+
 - hosts: node
   gather_facts: true
   roles:
   - flanneld
   - docker
-
-- hosts: master
-  gather_facts: true
-  roles:
-  - kubectl
-  # - kube-apiserver
-  # - kube-controller-manager
-  # - kube-scheduler
 
 
 

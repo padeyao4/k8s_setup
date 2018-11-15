@@ -16,9 +16,9 @@
   gather_facts: true
   roles:
   # - kubectl
-  - kube-apiserver
+  # - kube-apiserver
   # - kube-controller-manager
-  # - kube-scheduler
+  #  - kube-scheduler
   tasks:
     - name: 将master的证书和配置文件分发到node上
       synchronize:

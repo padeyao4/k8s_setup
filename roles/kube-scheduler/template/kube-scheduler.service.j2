@@ -4,13 +4,13 @@ Documentation=https://github.com/GoogleCloudPlatform/kubernetes
 
 [Service]
 ExecStart=/opt/kubernetes/server/bin/kube-scheduler \
-  --address 127.0.0.1 \
-  --kubeconfig /etc/kubernetes/ssl/kube-scheduler.kubeconfig \
-  --leader-elect true \
-  --alsologtostderr true \
-  --logtostderr false \
-  --log-dir /var/log/kubernetes \
-  --v 2
+  --address=0.0.0.0 \
+  --kubeconfig=/etc/kubernetes/ssl/kube-scheduler.kubeconfig \
+  --leader-elect=true \
+  --alsologtostderr=true \
+  --logtostderr=false \
+  --log-dir=/var/log/kubernetes \
+  --v=2
 Restart=on-failure
 RestartSec=5
 User=root

@@ -1,6 +1,6 @@
 - unarchive: src=../files/kubernetes.tar.gz dest=/opt/
 
-- template: src=../template/kube-controller-manager.service dest=/etc/systemd/system/
+- template: src=../template/kube-controller-manager.service.j2 dest=/etc/systemd/system/kube-controller-manager.service
 
 - command: systemctl daemon-reload 
 

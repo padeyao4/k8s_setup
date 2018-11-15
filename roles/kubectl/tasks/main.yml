@@ -3,7 +3,7 @@
 
 - copy: 
     src: ../files/{{item}}
-    dest: /etc/kubernetes/ssl/
+    dest: /etc/kubernetes/ssl/{{item}}
   with_items:
     - encryption-config.yml
     - token.csv

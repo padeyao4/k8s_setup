@@ -1,21 +1,21 @@
 ---
 - hosts: all
   roles:
-  - common
+  #- common
 
 - hosts: etcd
   gather_facts: true
   roles:
-  - etcd
+  #- etcd
 
 - hosts: etcd[0]
   tasks:
-  - command: /opt/etcd/etcdctl set '/kubernetes/network/config' '{"Network":"172.17.0.0/16"}'
+  #- command: /opt/etcd/etcdctl set '/kubernetes/network/config' '{"Network":"172.17.0.0/16"}'
 
 - hosts: master
   gather_facts: true
   roles:
-  - kubectl
+  # - kubectl
   - kube-apiserver
   # - kube-controller-manager
   # - kube-scheduler
@@ -33,8 +33,8 @@
 - hosts: node
   gather_facts: true
   roles:
-  - flanneld
-  - docker
+  #- flanneld
+  #- docker
 
 
 

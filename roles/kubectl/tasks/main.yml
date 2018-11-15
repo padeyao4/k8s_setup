@@ -33,4 +33,12 @@
     - create_crt.sh.j2
 
 - file: path=/etc/kubernetes/ssl state=directory
-- command: sh /etc/kubernetes/ssl/create_crt.sh
+
+- name: 生成证书和配置文件
+  shell: cd /etc/kubernetes/ssl/ && sh create_crt.sh
+  register: info 
+
+- name: 显示生成证书和配置文件的信息
+  debug: msg="{{info}}"
+
+

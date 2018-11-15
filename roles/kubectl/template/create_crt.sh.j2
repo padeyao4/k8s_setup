@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # 生成 ca
-cfssl gencert -initca ca-csr.json | cfssljson -bare ca
+cfssl gencert -initca /etc/kubernetes/ssl/ca-csr.json | cfssljson -bare ca
 
 # 创建 admin 证书
 cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
@@ -17,8 +17,8 @@ kubectl config set-cluster kubernetes \
   --kubeconfig=/etc/kubernetes/ssl/kubectl.kubeconfig
 
 kubectl config set-credentials admin \
-  --client-certificate=admin.pem \
-  --client-key=admin-key.pem \
+  --client-certificate=/etc/kubernetes/ssl/admin.pem \
+  --client-key=/etc/kubernetes/ssl/admin-key.pem \
   --embed-certs=true \
   --kubeconfig=/etc/kubernetes/ssl/kubectl.kubeconfig
 
@@ -51,8 +51,8 @@ kubectl config set-cluster kubernetes \
   --kubeconfig=/etc/kubernetes/ssl/kube-controller-manager.kubeconfig
 
 kubectl config set-credentials system:kube-controller-manager \
-  --client-certificate=kube-controller-manager.pem \
-  --client-key=kube-controller-manager-key.pem \
+  --client-certificate=/etc/kubernetes/ssl/kube-controller-manager.pem \
+  --client-key=/etc/kubernetes/ssl/kube-controller-manager-key.pem \
   --embed-certs=true \
   --kubeconfig=/etc/kubernetes/ssl/kube-controller-manager.kubeconfig
 
@@ -78,8 +78,8 @@ kubectl config set-cluster kubernetes \
   --kubeconfig=/etc/kubernetes/ssl/kube-scheduler.kubeconfig
 
 kubectl config set-credentials system:kube-scheduler \
-  --client-certificate=kube-scheduler.pem \
-  --client-key=kube-scheduler-key.pem \
+  --client-certificate=/etc/kubernetes/ssl/kube-scheduler.pem \
+  --client-key=/etc/kubernetes/ssl/kube-scheduler-key.pem \
   --embed-certs=true \
   --kubeconfig=/etc/kubernetes/ssl/kube-scheduler.kubeconfig
 
@@ -111,7 +111,7 @@ kubectl config use-context default --kubeconfig=/etc/kubernetes/ssl/kubelet-boot
 
 
 # 自动授权node的认证请求
-kubectl apply -f /etc/kubernetes/ssl/csr-crb.yaml
+# kubectl apply -f /etc/kubernetes/ssl/csr-crb.yaml
 
 # kube-proxy 证书
 cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
@@ -127,8 +127,8 @@ kubectl config set-cluster kubernetes \
   --kubeconfig=/etc/kubernetes/ssl/kube-proxy.kubeconfig
 
 kubectl config set-credentials kube-proxy \
-  --client-certificate=kube-proxy.pem \
-  --client-key=kube-proxy-key.pem \
+  --client-certificate=/etc/kubernetes/ssl/kube-proxy.pem \
+  --client-key=/etc/kubernetes/ssl/kube-proxy-key.pem \
   --embed-certs=true \
   --kubeconfig=/etc/kubernetes/ssl/kube-proxy.kubeconfig
 

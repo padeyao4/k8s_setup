@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+file_ca=/etc/kubernetes/ssl/ca.pem
+
+if [ -f "$file_ca" ] ; then
+    echo "存在ca.pem证书,不生成证书,退出脚本"
+    exit 0
+fi
+
 # 生成 ca
 cfssl gencert -initca /etc/kubernetes/ssl/ca-csr.json | cfssljson -bare ca
 
@@ -13,7 +20,7 @@ cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
 kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
   --embed-certs=true \
-  --server https://{{ansible_default_ipv4.address}}:6443 \
+  --server http://127.0.0.1:8080 \
   --kubeconfig=/etc/kubernetes/ssl/kubectl.kubeconfig
 
 kubectl config set-credentials admin \
@@ -47,7 +54,7 @@ cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
 kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
   --embed-certs=true \
-  --server http://{{ansible_default_ipv4.address}}:6443 \
+  --server http://127.0.0.1:8080 \
   --kubeconfig=/etc/kubernetes/ssl/kube-controller-manager.kubeconfig
 
 kubectl config set-credentials system:kube-controller-manager \
@@ -74,7 +81,7 @@ cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem \
 kubectl config set-cluster kubernetes \
   --certificate-authority=/etc/kubernetes/ssl/ca.pem \
   --embed-certs=true \
-  --server https://{{ansible_default_ipv4.address}}:6443 \
+  --server http://127.0.0.1:8080 \
   --kubeconfig=/etc/kubernetes/ssl/kube-scheduler.kubeconfig
 
 kubectl config set-credentials system:kube-scheduler \

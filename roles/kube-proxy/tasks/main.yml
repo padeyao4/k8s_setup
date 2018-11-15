@@ -1,0 +1,14 @@
+
+- unarchive: src=../files/kubernetes.tar.gz dest=/opt/
+
+- template: src=../template/kube-proxy.config.yml.j2 dest=/etc/kubernetes/ssl/kube-proxy.config.yml
+
+- file: path=/var/lib/kube-proxy state=directory
+
+- copy: src=../files/kube-proxy.service dest=/etc/systemd/system/
+
+- name: reload systemd
+  command: systemctl daemon-reload
+
+- name: start flannled
+  systemd: name=kube-proxy state=started enabled=yes

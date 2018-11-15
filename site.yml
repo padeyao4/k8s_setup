@@ -1,37 +1,50 @@
 ---
 - hosts: all
   roles:
-  #- common
+  - common
 
 - hosts: etcd
   gather_facts: true
   roles:
-  #- etcd
+  - etcd
 
 - hosts: etcd[0]
   tasks:
-  #- command: /opt/etcd/etcdctl set '/kubernetes/network/config' '{"Network":"172.17.0.0/16"}'
+  - command: /opt/etcd/etcdctl set '/kubernetes/network/config' '{"Network":"172.17.0.0/16"}'
+
+- hosts: master
+  gather_facts: true
+  roles:
+    - kubectl
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+  tasks:
+    - command: kubectl apply -f /etc/kubernetes/ssl/kubelet-bootstrap.yml
+    - command: kubectl apply -f /etc/kubernetes/ssl/csr-crb.yaml
 
 - hosts: node
   gather_facts: true
   roles:
-  # - kubectl
-  # - kube-apiserver
-  # - kube-controller-manager
-  #  - kube-scheduler
+  - flanneld
+  - docker
+
+- hosts: node
+  gather_facts: true
   tasks:
     - name: 将master的证书和配置文件分发到node上
       synchronize:
-        src: /root/test
-        dest: /root/test
+        src: /etc/kubernetes/ssl/{{item}}
+        dest: /etc/kubernetes/ssl/{{item}}
         mode: push
-      delegate_to: 172.31.211.138
+      with_items:
+        - ca.pem
+        - kubelet-bootstrap.kubeconfig
+        - kube-proxy.kubeconfig
+      delegate_to: "{{groups['master'][0]}}"
 
 - hosts: node
   gather_facts: true
   roles:
-  #- flanneld
-  #- docker
-
-
-
+  - kubelet
+  - kube-proxy

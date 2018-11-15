@@ -6,10 +6,11 @@
 * 主机配置root免密码登陆
 * etcd服务器要求数量大于等于3台,master 1台,worker 大于1台
 
-## 搭建后的k8s环境说明
+## k8s环境说明
 * k8s版本为1.10.4
 * flanneld版本为 v0.10.0
 * etcd 版本为 3.3.10 
+* docker 版本1 8.03.1-ce
 * etcd 集群没有tls加密
 
 ## 验证过的环境
@@ -23,3 +24,6 @@
 export ANSIBLE_CONFIG=./ansible.cfg
 ansible-playbook -i hosts site.yml
 ```
+
+## 协议
+MIT

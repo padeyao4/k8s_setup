@@ -6,7 +6,7 @@
 
 - copy: src=../files/daemon.json dest=/etc/docker/
 
-- file: src=/opt/docker/docker /usr/bin/docker state=link
+- file: src=/opt/docker/docker dest=/usr/bin/docker state=link
 
 - name: reload systemd
   command: systemctl daemon-reload

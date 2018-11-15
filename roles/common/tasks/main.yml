@@ -1,4 +1,5 @@
-- yum: 
+- name: 安装基础软件包
+  yum: 
     name:
     - epel-release
     - conntrack 
@@ -11,27 +12,30 @@
     - libseccomp
     state: latest
 
-- service: name=firewalld state=stopped enabled=no
+- name: 关闭防火墙
+  service: name=firewalld state=stopped enabled=no
 
-- lineinfile:
+- name: 关闭selinux
+  lineinfile:
     dest: /etc/selinux/config
     regexp: '^SELINUX='
     line: 'SELINUX=disabled'
 
-- command: swapoff -a
-- command: sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+- name: 关闭交换区
+  command: swapoff -a
 
-- command: modprobe br_netfilter
+- name: 加载netfilter模块
+  command: modprobe br_netfilter
 - command: modprobe ip_vs
 
 
 - copy: src=../files/kubernetes.conf dest=/etc/sysctl.d/
 - command: sysctl -p /etc/sysctl.d/kubernetes.conf
 
-- command: timedatectl set-timezone Asia/Shanghai
+- name: 设置时区
+  command: timedatectl set-timezone Asia/Shanghai
 - command: timedatectl set-local-rtc 0
 - systemd: name=rsyslog state=restarted
 - systemd: name=crond state=restarted
-- command: ntpdate cn.pool.ntp.org
 
 - file: path=/etc/kubernetes/ssl state=directory

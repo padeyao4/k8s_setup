@@ -15,4 +15,8 @@
 ## 如何运行
 
 1. 按照```example_hosts```添加服务器ip,并命名为```hosts```
-2. 执行```ansible-playbook -i hosts site.yml```
+2. 执行
+```
+export ANSIBLE_CONFIG=./ansible.cfg
+ansible-playbook -i hosts site.yml
+```

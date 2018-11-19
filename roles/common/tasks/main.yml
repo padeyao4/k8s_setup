@@ -30,7 +30,7 @@
 - command: modprobe ip_vs
 
 
-- copy: src=../files/kubernetes.conf dest=/etc/sysctl.d/
+- copy: src=kubernetes.conf dest=/etc/sysctl.d/
 - command: sysctl -p /etc/sysctl.d/kubernetes.conf
 
 - name: 设置时区

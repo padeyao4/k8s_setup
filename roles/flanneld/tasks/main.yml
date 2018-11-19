@@ -1,8 +1,8 @@
 - name: 复制flanneld到所有node节点
-  unarchive: src=../files/flanneld.tar.gz dest=/opt/ mode=500
+  unarchive: src=flanneld.tar.gz dest=/opt/ mode=500
 
 - name: 配置systemd文件
-  template: src=../template/flanneld.service.j2 dest=/etc/systemd/system/flanneld.service
+  template: src=flanneld.service.j2 dest=/etc/systemd/system/flanneld.service
 
 - name: reload systemd
   command: systemctl daemon-reload

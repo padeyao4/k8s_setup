@@ -1,8 +1,8 @@
-- unarchive: src=../files/cfssl.tar.gz dest=/opt/
-- unarchive: src=../files/kubernetes.tar.gz dest=/opt/
+- unarchive: src=cfssl.tar.gz dest=/opt/
+- unarchive: src=kubernetes.tar.gz dest=/opt/
 
 - copy: 
-    src: ../files/{{item}}
+    src: "{{item}}"
     dest: /etc/kubernetes/ssl/{{item}}
   with_items:
     - encryption-config.yml
@@ -20,7 +20,7 @@
 - file: src=/opt/kubernetes/server/bin/kubectl dest=/usr/bin/kubectl state=link
 
 - template: 
-    src: ../template/{{item}}
+    src: "{{item}}"
     dest: /etc/kubernetes/ssl/{{item|replace('.j2','')}}
   with_items:
     - ca-config.json.j2

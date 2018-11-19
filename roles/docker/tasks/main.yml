@@ -1,10 +1,10 @@
-- unarchive: src=../files/docker.tar.gz dest=/opt/ mode=500
+- unarchive: src=docker.tar.gz dest=/opt/ mode=500
 
-- copy: src=../files/docker.service dest=/etc/systemd/system/
+- copy: src=docker.service dest=/etc/systemd/system/
 
 - file: path=/etc/docker state=directory 
 
-- copy: src=../files/daemon.json dest=/etc/docker/
+- copy: src=daemon.json dest=/etc/docker/
 
 - file: src=/opt/docker/docker dest=/usr/bin/docker state=link
 
